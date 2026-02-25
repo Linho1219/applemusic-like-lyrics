@@ -150,12 +150,8 @@ gui
 	.onFinishChange((v: string) => {
 		window.globalBackground.setAlbum(v);
 	});
-gui
-	.add(debugValues, "forceUpdateAlbum")
-	.name("强制更新专辑图片");
-gui
-	.add(debugValues, "forceUpdateLyric")
-	.name("强制更新歌词");
+gui.add(debugValues, "forceUpdateAlbum").name("强制更新专辑图片");
+gui.add(debugValues, "forceUpdateLyric").name("强制更新歌词");
 const bgGui = gui.addFolder("背景");
 bgGui
 	.add(debugValues, "bgPlaying")

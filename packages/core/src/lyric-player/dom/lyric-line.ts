@@ -939,7 +939,8 @@ export class LyricLineEl extends LyricLineBase {
 		// main.style.opacity = `${opacity *
 		// 	(!this.hasFaded ? 1 : this.lyricPlayer._getIsNonDynamic() ? 1 : 0.3)
 		// 	}`;
-		const subopacity = opacity * (this.lyricPlayer._getIsNonDynamic() ? 0.5 : 0.3);
+		const subopacity =
+			opacity * (this.lyricPlayer._getIsNonDynamic() ? 0.5 : 0.3);
 		main.style.opacity = `${opacity}`;
 		trans.style.opacity = `${subopacity}`;
 		roman.style.opacity = `${subopacity}`;
