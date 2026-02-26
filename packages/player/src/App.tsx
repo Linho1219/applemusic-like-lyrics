@@ -3,7 +3,14 @@ import "@radix-ui/themes/styles.css";
 import { platform, version } from "@tauri-apps/plugin-os";
 import classNames from "classnames";
 import { atom, useAtomValue, useStore } from "jotai";
-import { lazy, StrictMode, Suspense, useEffect, useLayoutEffect } from "react";
+import {
+	lazy,
+	StrictMode,
+	Suspense,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -45,6 +52,7 @@ const hasBackgroundAtom = atom(false);
 
 function App() {
 	const store = useStore();
+	const isInitializedRef = useRef(false);
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 	const showStatJSFrame = useAtomValue(showStatJSFrameAtom);
 	const musicContextMode = useAtomValue(musicContextModeAtom);
@@ -75,8 +83,8 @@ function App() {
 
 	useEffect(() => {
 		const initializeWindow = async () => {
-			if ((window as any).__AMLL_PLAYER_INITIALIZED__) return;
-			(window as any).__AMLL_PLAYER_INITIALIZED__ = true;
+			if (isInitializedRef.current) return;
+			isInitializedRef.current = true;
 
 			setTimeout(async () => {
 				const { getCurrentWindow } = await import("@tauri-apps/api/window");
