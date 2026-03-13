@@ -18,9 +18,12 @@
 /
 [AMLL TTML Tool 逐词歌词编辑器](https://github.com/amll-dev/amll-ttml-tool)
 /
-[AMLL Player 音乐播放器](./packages/player/README.md)
+[AMLL Editor 下一代逐词歌词编辑器](https://github.com/amll-dev/amll-editor)
 /
-[AMLL Editor 下一代助词歌词编辑器](https://github.com/amll-dev/amll-editor)
+[AMLL Player 本地播放器](./packages/player/README.md)
+/
+[AMLL Page 网页播放器](https://github.com/apoint123/amll-page)
+
 
 [引用了 AMLL 的项目汇总](https://github.com/amll-dev/applemusic-like-lyrics/discussions/397)
 
