@@ -1,8 +1,11 @@
 use std::{
     fmt::Debug,
     fs::File,
-    sync::Arc,
-    time::{Duration, Instant},
+    sync::{
+        Arc,
+        atomic::{AtomicU64, Ordering},
+    },
+    time::Duration,
 };
 
 use super::fft_player::FFTPlayer;
@@ -40,6 +43,7 @@ pub struct AudioPlayer {
     current_song: Option<SongData>,
     current_audio_info: Arc<TokioRwLock<AudioInfo>>,
     current_position: Arc<TokioRwLock<f64>>,
+    current_samples_counter: Arc<TokioRwLock<Option<Arc<AtomicU64>>>>,
 
     current_audio_quality: Arc<TokioRwLock<AudioQuality>>,
     play_pos_sx: UnboundedSender<(bool, f64)>,
@@ -107,6 +111,8 @@ impl AudioPlayer {
 
         let current_audio_info = Arc::new(TokioRwLock::new(AudioInfo::default()));
         let current_position = Arc::new(TokioRwLock::new(0.0));
+        let current_samples_counter: Arc<TokioRwLock<Option<Arc<AtomicU64>>>> =
+            Arc::new(TokioRwLock::new(None));
         let current_audio_quality = Arc::new(TokioRwLock::new(AudioQuality::default()));
         let fft_player = Arc::new(ParkingLotRwLock::new(FFTPlayer::new()));
 
@@ -122,23 +128,21 @@ impl AudioPlayer {
 
         let position_writer = current_position.clone();
         let audio_info_reader = current_audio_info.clone();
+        let samples_counter_reader = current_samples_counter.clone();
         let emitter_pos = AudioPlayerEventEmitter::new(evt_sender.clone());
         let (play_pos_sx, mut play_pos_rx) = tokio::sync::mpsc::unbounded_channel::<(bool, f64)>();
         let media_state_manager_clone = media_state_manager.clone();
 
         tasks.push(tokio::task::spawn(async move {
             let mut time_it = tokio::time::interval(Duration::from_secs(1));
-            let mut ui_time_it = tokio::time::interval(Duration::from_millis(16));
 
             let mut is_playing = false;
             let mut base_time = 0.0;
-            let mut inst = Instant::now();
 
             loop {
                 if let Ok((new_is_playing, new_base_time)) = play_pos_rx.try_recv() {
                     is_playing = new_is_playing;
                     base_time = new_base_time;
-                    inst = Instant::now();
                     *position_writer.write().await = base_time;
 
                     let _ = emitter_pos
@@ -156,11 +160,20 @@ impl AudioPlayer {
                 }
 
                 tokio::select! {
-                    _ = ui_time_it.tick() => {
+                    _ = time_it.tick() => {
                         if is_playing {
                             let duration = audio_info_reader.read().await.duration;
                             if duration > 0.0 {
-                                let current_pos = (base_time + inst.elapsed().as_secs_f64()).min(duration);
+                                let played_time = if let Some(counter) = samples_counter_reader.read().await.as_ref() {
+                                    let samples = counter.load(Ordering::Relaxed) as f64;
+                                    let rate = target_sample_rate as f64;
+                                    let ch = target_channels as f64;
+                                    samples / (rate * ch)
+                                } else {
+                                    0.0
+                                };
+
+                                let current_pos = (base_time + played_time).min(duration);
                                 *position_writer.write().await = current_pos;
 
                                 let _ = emitter_pos
@@ -168,17 +181,14 @@ impl AudioPlayer {
                                         position: current_pos,
                                     })
                                     .await;
-                            }
-                        }
-                    }
-                    _ = time_it.tick() => {
-                        if is_playing
-                            && let Some(manager) = &media_state_manager_clone {
-                                let current_pos = *position_writer.read().await;
-                                if let Err(e) = manager.set_position(current_pos) {
-                                    tracing::warn!("更新 SMTC 进度失败: {e:?}");
+
+                                if let Some(manager) = &media_state_manager_clone {
+                                    if let Err(e) = manager.set_position(current_pos) {
+                                        tracing::warn!("更新 SMTC 进度失败: {e:?}");
+                                    }
                                 }
                             }
+                        }
                     }
                 }
             }
@@ -226,6 +236,7 @@ impl AudioPlayer {
             current_song: None,
             current_audio_info,
             current_position,
+            current_samples_counter,
             current_audio_quality,
             play_pos_sx,
             tasks,
@@ -414,6 +425,12 @@ impl AudioPlayer {
                         if handle.seek(seek_pos).is_err() {
                             warn!("发送跳转命令失败, 解码器可能已关闭");
                         } else {
+                            if let Some(counter) =
+                                self.current_samples_counter.read().await.as_ref()
+                            {
+                                counter.store(0, Ordering::SeqCst);
+                            }
+
                             let fft_player_clone = self.fft_player.clone();
                             tokio::task::spawn_blocking(move || {
                                 fft_player_clone.write().clear();
@@ -529,8 +546,9 @@ impl AudioPlayer {
         })
         .await?;
 
-        let (source, handle) = source_result?;
+        let (source, handle, samples_counter) = source_result?;
         self.current_decoder_handle = Some(handle);
+        *self.current_samples_counter.write().await = Some(samples_counter);
 
         let info = source.audio_info();
         let quality = source.audio_quality();

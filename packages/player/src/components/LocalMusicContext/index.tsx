@@ -531,6 +531,10 @@ export const LocalMusicContext: FC = () => {
 	const { t } = useTranslation();
 	const firstPlay = useRef(true);
 	const [musicPlaying, setMusicPlaying] = useAtom(musicPlayingAtom);
+	const lastSyncRef = useRef({
+		position: 0,
+		timestamp: performance.now(),
+	});
 
 	const syncMusicInfo = async (data: any) => {
 		if (!data || !data.musicInfo) {
@@ -648,6 +652,30 @@ export const LocalMusicContext: FC = () => {
 	};
 
 	useEffect(() => {
+		let rafId: number;
+
+		const updateLoop = () => {
+			const isPlaying = store.get(musicPlayingAtom);
+			if (isPlaying) {
+				const now = performance.now();
+				const dt = (now - lastSyncRef.current.timestamp) / 1000;
+				const newPos = lastSyncRef.current.position + dt;
+
+				const duration = store.get(musicDurationAtom) / 1000;
+				const clampedPos = Math.min(newPos, duration || 0);
+
+				store.set(musicPlayingPositionAtom, (clampedPos * 1000) | 0);
+			} else {
+				lastSyncRef.current.timestamp = performance.now();
+			}
+			rafId = requestAnimationFrame(updateLoop);
+		};
+
+		rafId = requestAnimationFrame(updateLoop);
+		return () => cancelAnimationFrame(rafId);
+	}, [store]);
+
+	useEffect(() => {
 		initAudioThread();
 
 		const toEmitThread = (type: Parameters<typeof emitAudioThread>[0]) => ({
@@ -716,16 +744,32 @@ export const LocalMusicContext: FC = () => {
 			const evtData = evt.payload.data;
 			switch (evtData?.type) {
 				case "playPosition": {
-					store.set(
-						musicPlayingPositionAtom,
-						(evtData.data.position * 1000) | 0,
-					);
+					const now = performance.now();
+					const dt = (now - lastSyncRef.current.timestamp) / 1000;
+					const currentExtrapolated = lastSyncRef.current.position + dt;
+
+					if (Math.abs(currentExtrapolated - evtData.data.position) > 0.05) {
+						lastSyncRef.current = {
+							position: evtData.data.position,
+							timestamp: now,
+						};
+						store.set(
+							musicPlayingPositionAtom,
+							(evtData.data.position * 1000) | 0,
+						);
+					}
 					break;
 				}
 
 				case "syncStatus": {
 					const status = evtData.data;
 					setMusicPlaying(status.isPlaying);
+
+					lastSyncRef.current = {
+						position: status.position,
+						timestamp: performance.now(),
+					};
+
 					store.set(musicVolumeAtom, status.volume);
 					store.set(currentPlaylistMusicIndexAtom, status.currentPlayIndex);
 
