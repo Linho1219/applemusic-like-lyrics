@@ -6,7 +6,7 @@
 
 [English](./README.md) / 简体中文
 
-一个基于 Web 技术制作的类 Apple Music 歌词显示组件库，同时支持[ DOM 原生](./packages/core/README.md)、[React ](./packages/react/README.md)和[ Vue ](./packages/react/README.md)绑定，[与各种平台兼容的外置播放器](./packages/player/README.md)也仍在制作当中。
+一个基于 Web 技术制作的类 Apple Music 歌词显示组件库，同时支持[ DOM 原生](./packages/core/README.md)、[React ](./packages/react/README.md)和[ Vue ](./packages/react/README.md)绑定。
 
 这是你能在前端系里能见到的最像 iPad Apple Music 的播放页面了。
 
@@ -15,11 +15,11 @@
 **—— AMLL 生态作品 ——**
 
 [AMLL TTML DB 逐词歌词仓库](https://github.com/amll-dev/amll-ttml-db)
-/
+
 [AMLL TTML Tool 逐词歌词编辑器](https://github.com/amll-dev/amll-ttml-tool)
 /
 [AMLL Editor 下一代逐词歌词编辑器](https://github.com/amll-dev/amll-editor)
-/
+
 [AMLL Player 本地播放器](./packages/player/README.md)
 /
 [AMLL Page 网页播放器](https://github.com/apoint123/amll-page)
