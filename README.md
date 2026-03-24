@@ -16,9 +16,9 @@ Although the goal of this project is not to imitate it completely, it will polis
 
 **—— AMLL Series Projects ——**
 
-[AMLL TTML DB - TTML Syllable Lyric Database](https://github.com/Steve-xmh/amll-ttml-db)
+[AMLL TTML DB - TTML Syllable Lyric Database](https://github.com/amll-dev/amll-ttml-db)
 /
-[AMLL TTML Tool - TTML Syllable Lyric Editor](https://github.com/Steve-xmh/amll-ttml-tool)
+[AMLL TTML Tool - TTML Syllable Lyric Editor](https://github.com/amll-dev/amll-ttml-tool)
 
 [Projects that references AMLL](https://github.com/amll-dev/applemusic-like-lyrics/discussions/397)
 
