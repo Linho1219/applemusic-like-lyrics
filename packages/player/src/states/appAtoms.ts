@@ -115,3 +115,21 @@ export const taskbarLyricAlignSettingAtom = atomWithStorage<
 export const taskbarLyricModeSettingAtom = atomWithStorage<
 	"auto" | "single" | "double"
 >("amll-player.taskbarLyricMode", "auto");
+
+export enum BottomLyricDisplayMode {
+	None = "none",
+	OnlyLyricAuthors = "only-lyric-authors",
+	OnlySongWriters = "only-song-writers",
+	PreferLyricAuthors = "prefer-lyric-authors",
+	PreferSongWriters = "prefer-song-writers",
+}
+
+export const bottomLyricDisplayModeAtom =
+	atomWithStorage<BottomLyricDisplayMode>(
+		"amll-player.bottomLyricDisplayMode",
+		BottomLyricDisplayMode.PreferSongWriters,
+	);
+
+export const currentLyricAuthorsAtom = atom<string[]>([]);
+
+export const currentSongWritersAtom = atom<string[]>([]);

@@ -36,6 +36,10 @@
 			"title": "Search / Import lyrics from AMLL TTML DB"
 		}
 	},
+	"bottom_lyric": {
+		"lyricAuthor": "Lyrics by:",
+		"songWriter": "Written by:"
+	},
 	"common": {
 		"dialog": {
 			"cancel": "Cancel",
@@ -261,6 +265,17 @@
 				"subtitle": "Lyrics Page Background Type"
 			},
 			"lyricContent": {
+				"bottomLyricMode": {
+					"description": "Control the display of song writers and lyric authors information at the bottom of the lyrics.",
+					"label": "Bottom Lyric Info Display",
+					"menu": {
+						"none": "None",
+						"onlyLyricAuthors": "Only Lyric Authors",
+						"onlySongWriters": "Only Song Writers",
+						"preferLyricAuthors": "Prefer Lyric Authors",
+						"preferSongWriters": "Prefer Song Writers"
+					}
+				},
 				"enableLyricRomanLine": {
 					"label": "Show Romanized Translation"
 				},

@@ -69,6 +69,7 @@ function pairLyric(line: LyricLine, lines: CoreLyricLine[], key: TransLine) {
 interface LyricParserResult {
 	lyricLines: LyricLine[];
 	hasLyrics: boolean;
+	metadata: [string, string[]][];
 }
 
 export const useLyricParser = (
@@ -79,11 +80,13 @@ export const useLyricParser = (
 ): LyricParserResult => {
 	return useMemo(() => {
 		if (!lyricStr || !format) {
-			return { lyricLines: [], hasLyrics: false };
+			return { lyricLines: [], hasLyrics: false, metadata: [] };
 		}
 
 		try {
 			let parsedLyricLines: LyricLine[] = [];
+			let parsedMetadata: [string, string[]][] = [];
+
 			switch (format) {
 				case "lrc": {
 					parsedLyricLines = parseLrc(lyricStr);
@@ -115,12 +118,19 @@ export const useLyricParser = (
 					break;
 				}
 				case "ttml": {
-					parsedLyricLines = parseTTML(lyricStr).lines;
-					console.log(LYRIC_LOG_TAG, "解析出 TTML 歌词", parsedLyricLines);
+					const ttmlResult = parseTTML(lyricStr);
+					parsedLyricLines = ttmlResult.lines;
+					parsedMetadata = ttmlResult.metadata;
+					console.log(
+						LYRIC_LOG_TAG,
+						"解析出 TTML 歌词",
+						parsedLyricLines,
+						parsedMetadata,
+					);
 					break;
 				}
 				default: {
-					return { lyricLines: [], hasLyrics: false };
+					return { lyricLines: [], hasLyrics: false, metadata: [] };
 				}
 			}
 
@@ -178,14 +188,14 @@ export const useLyricParser = (
 				}
 			}
 
-			const processedLines: CoreLyricLine[] = compatibleLyricLines;
 			return {
-				lyricLines: processedLines,
-				hasLyrics: processedLines.length > 0,
+				lyricLines: compatibleLyricLines,
+				hasLyrics: compatibleLyricLines.length > 0,
+				metadata: parsedMetadata,
 			};
 		} catch (e) {
 			console.warn("解析歌词时出现错误", e);
-			return { lyricLines: [], hasLyrics: false };
+			return { lyricLines: [], hasLyrics: false, metadata: [] };
 		}
 	}, [lyricStr, format, translatedLrc, romanLrc]);
 };

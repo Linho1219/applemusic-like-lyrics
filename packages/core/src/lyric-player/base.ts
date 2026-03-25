@@ -860,7 +860,6 @@ export abstract class LyricPlayerBase
 			targetLineHeight =
 				this.lyricLinesSize.get(curLine)?.[1] ?? LINE_HEIGHT_FALLBACK;
 		} else if (isBottomFocused) {
-			console.log(isBottomFocused);
 			targetLineHeight = this.bottomLine.lineSize[1];
 		}
 

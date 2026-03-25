@@ -41,6 +41,8 @@ import { db } from "../../dexie.ts";
 import { useLyricParser } from "../../hooks/useLyricParser.ts";
 import {
 	audioQualityDialogOpenedAtom,
+	currentLyricAuthorsAtom,
+	currentSongWritersAtom,
 	enableMediaControlsAtom,
 } from "../../states/appAtoms.ts";
 import {
@@ -182,6 +184,8 @@ const LyricContext: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
 	const setLyricLines = useSetAtom(musicLyricLinesAtom);
 	const setHideLyricView = useSetAtom(hideLyricViewAtom);
+	const setLyricAuthors = useSetAtom(currentLyricAuthorsAtom);
+	const setSongWriters = useSetAtom(currentSongWritersAtom);
 	const song = useLiveQuery(
 		() => (musicId ? db.songs.get(musicId) : undefined),
 		[musicId],
@@ -210,7 +214,7 @@ const LyricContext: FC = () => {
 		});
 	}, []);
 
-	const { lyricLines, hasLyrics } = useLyricParser(
+	const { lyricLines, hasLyrics, metadata } = useLyricParser(
 		song?.lyric,
 		song?.lyricFormat,
 		song?.translatedLrc,
@@ -220,7 +224,31 @@ const LyricContext: FC = () => {
 	useEffect(() => {
 		setLyricLines(lyricLines);
 		setHideLyricView(!hasLyrics);
-	}, [lyricLines, hasLyrics, setLyricLines, setHideLyricView]);
+
+		let lyricAuthors: string[] = [];
+		let songWriters: string[] = [];
+
+		if (metadata && metadata.length > 0) {
+			for (const [key, values] of metadata) {
+				if (key === "ttmlAuthorGithubLogin") {
+					lyricAuthors = values;
+				} else if (key === "songWriters") {
+					songWriters = values;
+				}
+			}
+		}
+
+		setLyricAuthors(lyricAuthors);
+		setSongWriters(songWriters);
+	}, [
+		lyricLines,
+		hasLyrics,
+		metadata,
+		setLyricLines,
+		setHideLyricView,
+		setLyricAuthors,
+		setSongWriters,
+	]);
 
 	return null;
 };

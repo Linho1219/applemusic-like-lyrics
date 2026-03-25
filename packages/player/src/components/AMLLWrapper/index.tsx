@@ -9,6 +9,7 @@ import { type FC, useLayoutEffect } from "react";
 import { useTitlebarAutoHide } from "../../utils/useTitlebarAutoHide.ts";
 import { AMLLContextMenuContent } from "../AMLLContextMenu/index.tsx";
 import { AudioQualityDialog } from "../AudioQualityDialog/index.tsx";
+import { BottomLyricInfo } from "../BottomLyricInfo";
 import { RecordPanel } from "../RecordPanel/index.tsx";
 import styles from "./index.module.css";
 
@@ -39,6 +40,7 @@ export const AMLLWrapper: FC = () => {
 						<PrebuiltLyricPlayer
 							id="amll-lyric-player"
 							style={{ width: "100%", height: "100%" }}
+							bottomLineSlot={<BottomLyricInfo />}
 						/>
 					</div>
 				</ContextMenu.Trigger>

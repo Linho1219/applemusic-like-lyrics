@@ -72,6 +72,8 @@ import { toast } from "react-toastify";
 import { router } from "../../router.tsx";
 import {
 	advanceLyricDynamicLyricTimeAtom,
+	BottomLyricDisplayMode,
+	bottomLyricDisplayModeAtom,
 	DarkMode,
 	darkModeAtom,
 	enableMediaControlsAtom,
@@ -413,6 +415,52 @@ const GeneralSettings = () => {
 
 const LyricContentSettings = () => {
 	const { t } = useTranslation();
+
+	const [bottomLyricDisplayMode, setBottomLyricDisplayMode] = useAtom(
+		bottomLyricDisplayModeAtom,
+	);
+
+	const bottomLyricMenu = useMemo(
+		() => [
+			{
+				label: t(
+					"page.settings.lyricContent.bottomLyricMode.menu.none",
+					"完全不显示",
+				),
+				value: BottomLyricDisplayMode.None,
+			},
+			{
+				label: t(
+					"page.settings.lyricContent.bottomLyricMode.menu.onlyLyricAuthors",
+					"只显示歌词作者",
+				),
+				value: BottomLyricDisplayMode.OnlyLyricAuthors,
+			},
+			{
+				label: t(
+					"page.settings.lyricContent.bottomLyricMode.menu.onlySongWriters",
+					"只显示创作者",
+				),
+				value: BottomLyricDisplayMode.OnlySongWriters,
+			},
+			{
+				label: t(
+					"page.settings.lyricContent.bottomLyricMode.menu.preferLyricAuthors",
+					"优先显示歌词作者",
+				),
+				value: BottomLyricDisplayMode.PreferLyricAuthors,
+			},
+			{
+				label: t(
+					"page.settings.lyricContent.bottomLyricMode.menu.preferSongWriters",
+					"优先显示创作者",
+				),
+				value: BottomLyricDisplayMode.PreferSongWriters,
+			},
+		],
+		[t],
+	);
+
 	return (
 		<>
 			<SubTitle>
@@ -443,6 +491,34 @@ const LyricContentSettings = () => {
 				)}
 				configAtom={enableLyricSwapTransRomanLineAtom}
 			/>
+
+			<Box height="1em" />
+			<SettingEntry
+				label={t(
+					"page.settings.lyricContent.bottomLyricMode.label",
+					"底部信息",
+				)}
+				description={t(
+					"page.settings.lyricContent.bottomLyricMode.description",
+					"控制歌词底部显示的歌曲创作者及歌词作者信息",
+				)}
+			>
+				<Select.Root
+					value={bottomLyricDisplayMode}
+					onValueChange={(v) =>
+						setBottomLyricDisplayMode(v as BottomLyricDisplayMode)
+					}
+				>
+					<Select.Trigger />
+					<Select.Content>
+						{bottomLyricMenu.map((item) => (
+							<Select.Item key={item.value} value={item.value}>
+								{item.label}
+							</Select.Item>
+						))}
+					</Select.Content>
+				</Select.Root>
+			</SettingEntry>
 		</>
 	);
 };
