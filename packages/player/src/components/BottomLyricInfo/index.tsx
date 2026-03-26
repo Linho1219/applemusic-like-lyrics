@@ -44,7 +44,6 @@ export const BottomLyricInfo: FC = () => {
 			return null;
 		}
 
-		const lyricsStr = lyricAuthors.join(", ");
 		const writersStr = songWriters.join(", ");
 
 		const hasLyrics = lyricAuthors.length > 0;
@@ -52,8 +51,24 @@ export const BottomLyricInfo: FC = () => {
 
 		const renderLyrics = () => (
 			<>
-				<strong>{t("bottom_lyric.lyricAuthor", "歌词作者：")}</strong>
-				{lyricsStr}
+				<span className={styles.textContent}>
+					<strong>{t("bottom_lyric.lyricAuthor", "歌词作者：")}</strong>
+				</span>
+				{lyricAuthors.map((author, index) => (
+					<span key={`${author}-${index}`}>
+						<a
+							href={`https://github.com/${author}`}
+							target="_blank"
+							rel="noreferrer noopener"
+							className={styles.authorName}
+						>
+							<span className={styles.textContent}>{author}</span>
+						</a>
+						<span className={styles.textContent}>
+							{index < lyricAuthors.length - 1 ? ", " : ""}
+						</span>
+					</span>
+				))}
 			</>
 		);
 
