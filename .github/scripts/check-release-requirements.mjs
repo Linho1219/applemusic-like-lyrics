@@ -14,8 +14,6 @@ const ignoredMatchers = [
 	(file) => file.endsWith(".mdx"),
 	(file) => file.startsWith(".github/"),
 	(file) => file.startsWith(".nx/version-plans/"),
-	(file) => file.startsWith("packages/player"),
-	(file) => file.startsWith("packages/skia-player"),
 	(file) => file === ".editorconfig",
 	(file) => file === ".gitignore",
 	(file) => file === "biome.json",
@@ -31,6 +29,11 @@ const ignoredMatchers = [
 	(file) => file === "tsconfig.json",
 	(file) => file.startsWith("packages/docs/"),
 	(file) => /^packages\/[^/]+\/docs\//.test(file),
+
+	// legacy: AMLL Player
+	(file) => file.startsWith("packages/player"),
+	(file) => file.startsWith("packages/skia-player"),
+	(file) => file === "crowdin.yml",
 ];
 
 const isIgnoredFile = (file) =>
