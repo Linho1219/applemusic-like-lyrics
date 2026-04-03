@@ -121,8 +121,8 @@ importers:
         version: 4.0.0-beta.2
     devDependencies:
       '@applemusic-like-lyrics/lyric':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: workspace:^
+        version: link:../lyric
       '@applemusic-like-lyrics/ttml':
         specifier: workspace:^
         version: link:../ttml
@@ -453,9 +453,6 @@ importers:
   packages/ws-protocol: {}
 
 packages:
-
-  '@applemusic-like-lyrics/lyric@0.3.0':
-    resolution: {integrity: sha512-ZGyBheZZfqjQmGnEUciNKCARwkqIP39ONZirJE+NOQjQ47TYlZz4tlLBRH/uRfq5qviYyJ1S9Q+pZxlYoyHWVw==}
 
   '@astrojs/compiler@3.0.1':
     resolution: {integrity: sha512-z97oYbdebO5aoWzuJ/8q5hLK232+17KcLZ7cJ8BCWk6+qNzVxn/gftC0KzMBUTD8WAaBkPpNSQK6PXLnNrZ0CA==}
@@ -7353,8 +7350,6 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
-
-  '@applemusic-like-lyrics/lyric@0.3.0': {}
 
   '@astrojs/compiler@3.0.1': {}
 
